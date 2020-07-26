@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.example</groupId>
+    <artifactId>CustomMacros</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <dependency-base-path>D:/Programmierung/IntelliJProjects</dependency-base-path>
+        <system-hook-path>${dependency-base-path}/system-hook-3.4.jar</system-hook-path>
+        <gamepad4j-path>${dependency-base-path}/gamepad4j-api-0.2-javadoc.jar</gamepad4j-path>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.10.2</version>
+        </dependency>
+        <dependency>
+            <groupId>system-hook</groupId>
+            <artifactId>system-hook</artifactId>
+            <version>0.3.4</version>
+            <scope>system</scope>
+            <systemPath>${system-hook-path}</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>gamepad4j</groupId>
+            <artifactId>gamepad4j</artifactId>
+            <version>0.0.2</version>
+            <scope>system</scope>
+            <systemPath>${gamepad4j-path}</systemPath>
+        </dependency>
+    </dependencies>
+
+
+</project>
