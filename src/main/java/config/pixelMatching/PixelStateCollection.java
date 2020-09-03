@@ -1,15 +1,19 @@
-package pixelMatching;
+package config.pixelMatching;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import config.deserializers.PixelStateCollectionDeserializer;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
+@JsonDeserialize(using = PixelStateCollectionDeserializer.class)
 public class PixelStateCollection {
-	private final ArrayList<ProbingPixel> probingPixels = new ArrayList<>();
+	private final ArrayList<_ProbingPixel> probingPixels = new ArrayList<>();
 	private Rectangle targetRectangle = null;
 
-	public PixelStateCollection addProbingPixel(ProbingPixel probingPixel) {
+	public PixelStateCollection addProbingPixel(_ProbingPixel probingPixel) {
 		probingPixels.add(probingPixel);
 		updateScreenshotRectangle(probingPixel);
 		return this;
@@ -20,17 +24,17 @@ public class PixelStateCollection {
 		return robot.createScreenCapture(targetRectangle);
 	}
 
-	public boolean allPixelsMatching(Robot robot){
+	public boolean allPixelsMatching(Robot robot) {
 		return allPixelsMatching(takeScreenshot(robot));
 	}
 
-	public boolean allPixelsMatching(BufferedImage buffImg){
+	public boolean allPixelsMatching(BufferedImage buffImg) {
 		return probingPixels
 				.stream()
 				.allMatch(probingPixel -> probingPixel.correctColor(buffImg, targetRectangle));
 	}
 
-	private void updateScreenshotRectangle(ProbingPixel probingPixel) {
+	private void updateScreenshotRectangle(_ProbingPixel probingPixel) {
 		if (targetRectangle == null) {
 			targetRectangle = new Rectangle(probingPixel.getX(), probingPixel.getY(), 1, 1);
 			return;
@@ -64,5 +68,13 @@ public class PixelStateCollection {
 			int delta = probingPixel.getY() - targetMaxY;
 			targetRectangle.height += delta;
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "PixelStateCollection{" +
+				"probingPixels=" + probingPixels.stream().map(Object::toString).collect(Collectors.joining(", ")) +
+				", targetRectangle=" + targetRectangle +
+				'}';
 	}
 }
