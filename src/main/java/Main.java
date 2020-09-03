@@ -1,4 +1,5 @@
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -24,7 +25,7 @@ public class Main {
 		}
 
 		LoadedActions actions;
-		URL configUrl = Thread.currentThread().getContextClassLoader().getResource("testConfig3.conf");
+		URL configUrl = Thread.currentThread().getContextClassLoader().getResource("testConfig2.conf");
 
 		if (configUrl == null) {
 			System.err.println("Failed to find configFile!");
@@ -48,6 +49,7 @@ public class Main {
 			System.out.println(jsonString);
 
 			ObjectMapper mapper = new ObjectMapper();
+			mapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_VALUES);
 			actions = mapper.readValue(jsonString, LoadedActions.class);
 		} catch (URISyntaxException e) {
 			System.err.println("Failed to find configFile!");
@@ -68,6 +70,9 @@ public class Main {
 	}
 
 	public static void runMacros(Robot robot, KeyManager keyManager, LoadedActions actions) {
-
+		/*XStream xStream = new XStream(new Sun14ReflectionProvider(
+				new FieldDictionary(new ImmutableFieldKeySorter())),
+				new DomDriver("utf-8"));
+		System.out.println(xStream.toXML(actions));*/
 	}
 }

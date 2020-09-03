@@ -10,10 +10,10 @@ import java.util.stream.Collectors;
 
 @JsonDeserialize(using = PixelStateCollectionDeserializer.class)
 public class PixelStateCollection {
-	private final ArrayList<_ProbingPixel> probingPixels = new ArrayList<>();
+	private final ArrayList<ProbingPixel> probingPixels = new ArrayList<>();
 	private Rectangle targetRectangle = null;
 
-	public PixelStateCollection addProbingPixel(_ProbingPixel probingPixel) {
+	public PixelStateCollection addProbingPixel(ProbingPixel probingPixel) {
 		probingPixels.add(probingPixel);
 		updateScreenshotRectangle(probingPixel);
 		return this;
@@ -34,7 +34,7 @@ public class PixelStateCollection {
 				.allMatch(probingPixel -> probingPixel.correctColor(buffImg, targetRectangle));
 	}
 
-	private void updateScreenshotRectangle(_ProbingPixel probingPixel) {
+	private void updateScreenshotRectangle(ProbingPixel probingPixel) {
 		if (targetRectangle == null) {
 			targetRectangle = new Rectangle(probingPixel.getX(), probingPixel.getY(), 1, 1);
 			return;

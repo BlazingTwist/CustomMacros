@@ -1,6 +1,5 @@
 package config.instructions;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -8,8 +7,7 @@ import config.deserializers.KeyEventDeserializer;
 import java.awt.Robot;
 import keybinds.KeyManager;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class TapKey extends _Instruction {
+public class TapKey implements Instruction {
 
 	@JsonProperty("keyEvent")
 	@JsonDeserialize(using = KeyEventDeserializer.class)
@@ -18,10 +16,6 @@ public class TapKey extends _Instruction {
 
 	@JsonProperty("duration")
 	public long duration = 0;
-
-	public TapKey(){
-		throw new RuntimeException("give me a goddamm stacktrace");
-	}
 
 	@Override
 	public void run(Robot robot, KeyManager keyManager) {

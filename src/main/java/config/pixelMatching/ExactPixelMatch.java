@@ -1,15 +1,21 @@
 package config.pixelMatching;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import config.deserializers.ColorDeserializer;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import utils.RGBColor;
 
-public class ExactPixelMatch implements _ProbingPixel {
+public class ExactPixelMatch implements ProbingPixel {
+
+	@JsonProperty("x")
 	public int x;
+
+	@JsonProperty("y")
 	public int y;
+
+	@JsonProperty("rgb")
+	@JsonDeserialize(using = ColorDeserializer.class)
 	public int rgb;
 
 	/**
@@ -37,23 +43,5 @@ public class ExactPixelMatch implements _ProbingPixel {
 	@Override
 	public boolean correctColor(BufferedImage buffImg, Rectangle screenshotArea) {
 		return buffImg.getRGB(x - screenshotArea.x, y - screenshotArea.y) == rgb;
-	}
-
-	@Override
-	public _ProbingPixel deserialize(ObjectMapper mapper, JsonNode node) throws IOException {
-		this.x = node.get("x").asInt();
-		this.y = node.get("y").asInt();
-		this.rgb = mapper.readValue(mapper.writeValueAsString(node.get("rgb")), RGBColor.class).toAwtColor();
-		System.out.println("deserialized: " + this.toString());
-		return this;
-	}
-
-	@Override
-	public String toString() {
-		return "ExactPixelMatch{" +
-				"x=" + x +
-				", y=" + y +
-				", rgb=" + rgb +
-				'}';
 	}
 }

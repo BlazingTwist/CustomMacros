@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import config.pixelMatching.PixelStateCollection;
-import config.pixelMatching._ProbingPixel;
+import config.pixelMatching.ProbingPixel;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -26,7 +26,7 @@ public class PixelStateCollectionDeserializer extends StdDeserializer<PixelState
 	@Override
 	public PixelStateCollection deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
 			throws IOException, JsonProcessingException {
-		TypeReference<ArrayList<_ProbingPixel>> typeRef = new TypeReference<>() {
+		TypeReference<ArrayList<ProbingPixel>> typeRef = new TypeReference<>() {
 		};
 		ObjectMapper mapper = (ObjectMapper) jsonParser.getCodec();
 		PixelStateCollection result = new PixelStateCollection();

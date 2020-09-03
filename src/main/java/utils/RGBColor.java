@@ -12,6 +12,9 @@ public class RGBColor {
 	@JsonProperty("blue")
 	public int blue = 0;
 
+	/**
+	 * required for deserialization
+	 */
 	private RGBColor() {
 	}
 
