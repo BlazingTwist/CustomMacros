@@ -6,21 +6,18 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import config.DisplayConfig;
 import config.pixelMatching.PixelStateCollection;
 import config.pixelMatching.ProbingPixel;
 import java.io.IOException;
 import java.util.ArrayList;
 
 public class PixelStateCollectionDeserializer extends StdDeserializer<PixelStateCollection> {
-	/**
-	 * Required by Jackson
-	 */
-	public PixelStateCollectionDeserializer(){
-		this(null);
-	}
+	private final DisplayConfig displayConfig;
 
-	protected PixelStateCollectionDeserializer(Class<?> vc) {
-		super(vc);
+	public PixelStateCollectionDeserializer(DisplayConfig displayConfig){
+		super((Class<?>)null);
+		this.displayConfig = displayConfig;
 	}
 
 	@Override
@@ -30,7 +27,11 @@ public class PixelStateCollectionDeserializer extends StdDeserializer<PixelState
 		};
 		ObjectMapper mapper = (ObjectMapper) jsonParser.getCodec();
 		PixelStateCollection result = new PixelStateCollection();
-		mapper.readValue(jsonParser, typeRef).forEach(result::addProbingPixel);
+		ArrayList<ProbingPixel> probingPixels = mapper.readValue(jsonParser, typeRef);
+		for (ProbingPixel probingPixel : probingPixels) {
+			probingPixel.applyDisplayScale(displayConfig);
+			result.addProbingPixel(probingPixel);
+		}
 		return result;
 	}
 }

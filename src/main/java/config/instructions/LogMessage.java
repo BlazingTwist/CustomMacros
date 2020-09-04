@@ -5,17 +5,16 @@ import config.DisplayConfig;
 import config.LoadedConfigCore;
 import config.instructions.callbacks.DoneCallback;
 import config.instructions.callbacks.InstructionCallback;
-import config.pixelMatching.PixelStateCollection;
 import java.awt.Robot;
 
-public class WaitForPixelState implements Instruction {
+public class LogMessage implements Instruction{
 
-	@JsonProperty("pixelStateCollection")
-	PixelStateCollection pixelStateCollection = null;
+	@JsonProperty("message")
+	private String message = null;
 
 	@Override
 	public InstructionCallback run(Robot robot, LoadedConfigCore configCore, DisplayConfig displayConfig) {
-		while(!pixelStateCollection.allPixelsMatching(robot));
+		System.out.println(message);
 		return new DoneCallback();
 	}
 }

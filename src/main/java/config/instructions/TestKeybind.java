@@ -6,27 +6,26 @@ import config.LoadedConfigCore;
 import config.instructions.callbacks.ChangeToActionCallback;
 import config.instructions.callbacks.DoneCallback;
 import config.instructions.callbacks.InstructionCallback;
-import config.pixelMatching.PixelStateCollection;
 import java.awt.Robot;
 
-public class ProbeScreen implements Instruction {
+public class TestKeybind implements Instruction{
 
-	@JsonProperty("pixelStateCollection")
-	public PixelStateCollection pixelStateCollection = null;
+	@JsonProperty("keybind")
+	private String keybind = null;
 
-	@JsonProperty("actionNameIfMatch")
-	public String actionNameIfMatch = null;
+	@JsonProperty("actionNameIfPressed")
+	private String actionNameIfPressed = null;
 
 	@JsonProperty("actionNameElse")
-	public String actionNameElse = null;
+	private String actionNameElse = null;
 
 	@Override
 	public InstructionCallback run(Robot robot, LoadedConfigCore configCore, DisplayConfig displayConfig) {
-		if(pixelStateCollection.allPixelsMatching(robot)){
-			if(actionNameIfMatch == null){
+		if(configCore.getKeyManager().isModulePressed(keybind)){
+			if(actionNameIfPressed == null){
 				return new DoneCallback();
 			}
-			return new ChangeToActionCallback(actionNameIfMatch);
+			return new ChangeToActionCallback(actionNameIfPressed);
 		}else{
 			if(actionNameElse == null){
 				return new DoneCallback();

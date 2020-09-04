@@ -7,20 +7,142 @@ You can find an exhaustive documentation on HOCON [here](https://github.com/ligh
 ## General Structure
 
 You can place any kind of HOCON valid text in the root of your .conf Files.  
-The only section that requires strict attention (and is actually used outside of substitutions) is the `actions` object.  
-In code, it is stored as a Map<ModuleName, Map<ActionName, List<Instruction>>>  
+There are however a few reserved object keys that required a strictly defined structure:
+
+* actions
+* displayConfig
+* flowControl
+* hotkeys
+* keybinds
+* onStuck
+
+<br/>
+
+#### ***actions***
+
+In code, the actions object is stored as a Map<ModuleName, Map<ActionName, List<Instruction>>>  
 As such, it represents a hierarchy of ModuleName -> ActionName -> Instructions.
 
-ModuleName and ActionName are up to you to decide (no duplicates), however Instructions are defined rigidly.
+ModuleName and ActionName are up to you to decide (no duplicates), however Instructions are rigidly defined.  
+see [Supported Instructions and Syntax](#supported-instructions-and-syntax)
+
+<br/>
+
+#### ***displayConfig***
+
+This contains information to streamline compatibility of scripts across different resolutions.  
+`sourceResolution` contains the resolution that was used for creating the script.  
+`targetResolution` contains the resolution the script is mapped to (typically the resolution of your screen).  
+It is imperative that both resolutions are specified in the config, even if they have the same value.
+
+```hocon
+displayConfig {
+  sourceResolution {width = 3840, height = 2160}
+  targetResolution {width = 1920, height = 1080}
+}
+```
+
+<br/>
+
+#### ***flowControl***
+
+In this object you can assign keybinds to "flowControl"-functions by assigning the desired keybindName to them.  
+Currently, there are four flowControl-functions:  
+
+`pauseAction` will pause execution of the active Action.  
+`unpauseAction` will continue execution of the (paused) active Action.  
+`quitModule` will force-quit the active Action and its Module.  
+`exit` will force-quit the application.
+
+```hocon
+flowControl {
+  pauseAction = keybindName1
+  unpauseAction = null //not assigned
+                       //quitModule is also not assigned
+  exit = keybindName2
+}
+```
+
+<br/>
+
+#### ***hotkeys***
+
+Here you can specify all entry-points for your actions, every hotkey object has 4 fields:  
+`keybind` the name of the keybind the hotkey is activated with.  
+`global` boolean value, global hotkeys can trigger during execution of another action and will act like the "ChangeToAction" Instruction.  
+`module` the name of the module that this hotkey executes.  
+`action` the name of the action (within the executed module) that this hotkey executes.
+
+```hocon
+hotkeys = [
+  {
+    keybind = keybindName1
+    global = false
+    module = moduleName
+    action = actionName1
+  }
+  //...
+  {
+    keybind = keybindNameN
+    global = true
+    module = moduleName
+    action = actionNameN
+  }
+]
+```
+
+<br/>
+
+#### ***keybinds***
+
+In this object all available keybinds and their assigned keys are specified.  
+The structure is a Map<String, List<KeyModule>>, as such, every key in the keybinds object is used as the name for the keybind.  
+There are currently four types of KeyModules:  
+`KeyDown` Is satisfied if the assigned key is pressed.  
+`KeyUp` Is satisfied if the assigned key is released.  
+`OnKeyDown` Is only satisfied if the key has just been pressed.  
+`OnKeyUp` Is only satisfied if the key has just been released.
+  
+You can read up on the naming for `keyEvent` [here](https://docs.oracle.com/javase/7/docs/api/java/awt/event/KeyEvent.html).
+
+```hocon
+keybinds {
+  keybindName1 = [
+    {type = keyDown, keyEvent = VK_CONTROL}
+    {type = keyUp, keyEvent = VK_SHIFT}
+    {type = onKeyDown, keyEvent = VK_P}
+  ]
+  //...
+  keybindNameN = [
+    {type = keyDown, keyEvent = VK_CONTROL}
+    {type = keyDown, keyEvent = VK_SHIFT}
+    {type = onKeyDown, keyEvent = VK_P}
+  ]
+}
+```
+
+<br/>
+
+#### ***onStuck***
+
+In this object you can specify a certain Action to execute if an Instruction gets stuck for a certain duration.  
+There are currently 3 fields in the onStuck object:  
+`delay` the amount of time an Instruction has to be stuck for to trigger this function.  
+`module` the name of the module that is to be executed.  
+`action` the name of the action that is to be executed.
+
+If you don't want to specify any onStuck behaviour, you can omit this object from the script.
+
+<br/>
 
 ## Supported Instructions and Syntax
 
 Every Instruction follows the same basic Syntax:
-```
+```hocon
 {
   type = InstructionType (name of Instruction)
   param1 = value1
-  ...
+  //...
   paramN = valueN
 }
 ```
@@ -52,20 +174,157 @@ Note: `actionName` must correspond to an ActionName within the active Module, ot
 
 <br/>
 
+#### ***ExecCommand***
+
+You can use this Instruction to run command line commands.  
+
+```hocon
+{
+  type = execCommand
+  command = shutdown /h
+}
+```
+
+<br/>
+
+#### ***LogMessage***
+
+You can use this Instruction to log a `message` to the console.  
+Primary purpose is for debugging your scripts.
+
+```hocon
+{
+  type = logMessage
+  message = This is some kind of debug-text
+}
+```
+
+<br/>
+
+#### ***MouseClick***
+
+Use this Instruction to press and release mouse buttons.  
+`duration` specifies the duration the button is held down.  
+`mouseButton` is any number starting from 1 (LMB)  
+Note: this Instruction will halt program execution for the given duration.
+
+```hocon
+{
+  type = mouseClick
+  mouseButton = [1-9]
+  duration = [0-9]+
+}
+```
+
+<br/>
+
+#### ***MouseMove***
+
+This Instruction will try to smoothly move your mouse from the start position to the end position within the specified duration.  
+Note: this Instruction will halt program execution for the given duration.
+
+```hocon
+{
+  type = "mouseMove"
+  startX = [0-9]+
+  startY = [0-9]+
+  endX = [0-9]+
+  endY = [0-9]+
+  duration = [0-9]+
+}
+```
+
+<br/>
+
+#### ***MousePress***
+
+This Instruction will press and hold the specified mouse key until a `MouseRelease` Instruction is executed.  
+`mouseButton` is any number starting from 1 (LMB)
+
+```hocon
+{
+  type = mousePress
+  mouseButton = [1-9]
+}
+```
+
+<br/>
+
+#### ***MouseRelease***
+
+This Instruction will release the specified mouse key until (provided the button is pressed, see `MousePress`)    
+`mouseButton` is any number starting from 1 (LMB)
+
+```hocon
+{
+  type = mouseRelease
+  mouseButton = [1-9]
+}
+```
+
+<br/>
+
+#### ***MouseSnap***
+
+This Instruction will snap the mouse to the specified position.  
+Note: This (for some reason) tends to be a rather inaccurate operation.  
+If you can spare the milliseconds, `MouseMove` is more precise.
+
+```hocon
+{
+  type = mouseSnap
+  x = [0-9]+
+  y = [0-9]+
+}
+```
+
+<br/>
+
+#### ***PressKey***
+
+This Instruction will press and hold the specified key upon execution.  
+Make sure to call ReleaseKey eventually, or consider using TapKey instead.  
+You can read up on the naming for `keyEvent` [here](https://docs.oracle.com/javase/7/docs/api/java/awt/event/KeyEvent.html).
+
+```hocon
+{
+  type = pressKey
+  keyEvent = VK_ENTER
+}
+```
+
+<br/>
+
 #### ***ProbeScreen***
 
 The ProbeScreen Instruction will compare a screenshot against every Pixel in the provided `pixelStateCollection`  
 If all ProbingPixels within the PixelStateCollection are satisfied, it will execute the Action specified in `actionNameIfMatch`, otherwise `actionNameElse` (equivalent to executing a ChangeToAction Instruction)  
+If you want to conditionally continue the execution of the current action, you can specify `null` as `actionNameIfMatch` or `actionNameElse`  
 Note: PixelStateCollections and ProbingPixels are documented under [DataStructures used by Instructions](#datastructures-used-by-instructions).
 
 ```hocon
 {
   type = probeScreen
   pixelStateCollection = [probingPixel1, ..., probingPixelN]
-  actionNameIfMatch = ActionNameA
-  actionNameElse = ActionNameB
+  actionNameIfMatch = ActionName
+  actionNameElse = null
 }
 ``` 
+
+<br/>
+
+#### ***ReleaseKey***
+
+This Instruction will release specified key upon execution. (provided that the key is pressed)  
+Make sure to call PressKey first, or consider using TapKey instead.  
+You can read up on the naming for `keyEvent` [here](https://docs.oracle.com/javase/7/docs/api/java/awt/event/KeyEvent.html).
+
+```hocon
+{
+  type = releaseKey
+  keyEvent = VK_ENTER
+}
+```
 
 <br/>
 
@@ -74,7 +333,7 @@ Note: PixelStateCollections and ProbingPixels are documented under [DataStructur
 This Instruction will repeat another Action any given amount of times.  
 The amount of repetitions is specified in the `count` field.  
 A List of Instructions to execute is specified in the `action` field.  
-Note: Unlike the ChangeToAction Instruction, this instruction will resume execution within the active Action upon completion.
+Note: Unlike the ChangeToAction Instruction, this Instruction will resume execution within the active Action upon completion.
 
 ```hocon
 {
@@ -102,13 +361,31 @@ The purpose of this Instruction is to enable easy usage of HOCON substitution, i
 #### ***TapKey***
 
 Presses and holds a key for a given `duration` (in milliseconds).  
-You can read up on the naming for `keyEvent` [here](https://docs.oracle.com/javase/7/docs/api/java/awt/event/KeyEvent.html).
+You can read up on the naming for `keyEvent` [here](https://docs.oracle.com/javase/7/docs/api/java/awt/event/KeyEvent.html).  
+Note: The tapKey Instruction will halt program execution for the given duration.
 
 ```hocon
 {
   type = tapKey
   keyEvent = VK_ENTER
   duration = [0-9]+
+}
+```
+
+<br/>
+
+#### ***TestKeybind***
+
+This Instruction will check whether the specified keybind is pressed or not.  
+If it is pressed, the action in `actionNameIfPressed` is executed, otherwise `actionNameElse`  
+You can specify the value `null` as an ActionName to conditionally continue the execution of the active action.
+
+```hocon
+{
+  type = testKeybind
+  keybind = keybindName
+  actionNameIfPressed = ActionName
+  actionNameElse = null
 }
 ```
 
@@ -122,6 +399,19 @@ As the naming implies, will halt the execution for a given `duration` (in millis
 {
   type = wait
   duration = [0-9]+
+}
+```
+
+<br/>
+
+#### ***WaitForKeybind***
+
+This instruction will halt program execution until the specified keybind is pressed.
+
+```hocon
+{
+  type = waitForKeybind
+  keybind = keybindName
 }
 ```
 

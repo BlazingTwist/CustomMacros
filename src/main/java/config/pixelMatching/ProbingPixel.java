@@ -2,6 +2,7 @@ package config.pixelMatching;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import config.DisplayConfig;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
@@ -22,4 +23,6 @@ public interface ProbingPixel {
 	default int getColor(BufferedImage buffImg){
 		return buffImg.getRGB(getX(), getY());
 	}
+
+	void applyDisplayScale(DisplayConfig displayConfig);
 }

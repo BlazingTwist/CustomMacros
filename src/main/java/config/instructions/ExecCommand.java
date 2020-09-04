@@ -4,18 +4,25 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import config.DisplayConfig;
 import config.LoadedConfigCore;
 import config.instructions.callbacks.DoneCallback;
+import config.instructions.callbacks.EncounteredExceptionCallback;
 import config.instructions.callbacks.InstructionCallback;
-import config.pixelMatching.PixelStateCollection;
 import java.awt.Robot;
+import java.io.IOException;
 
-public class WaitForPixelState implements Instruction {
+public class ExecCommand implements Instruction {
 
-	@JsonProperty("pixelStateCollection")
-	PixelStateCollection pixelStateCollection = null;
+	@JsonProperty("command")
+	String command = null;
 
 	@Override
 	public InstructionCallback run(Robot robot, LoadedConfigCore configCore, DisplayConfig displayConfig) {
-		while(!pixelStateCollection.allPixelsMatching(robot));
+		Runtime runtime = Runtime.getRuntime();
+		try{
+			runtime.exec(command);
+		}catch(IOException e){
+			return new EncounteredExceptionCallback(
+					new RuntimeException("unable to execute command: '" + command + "'!", e));
+		}
 		return new DoneCallback();
 	}
 }

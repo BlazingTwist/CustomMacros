@@ -5,17 +5,19 @@ import config.DisplayConfig;
 import config.LoadedConfigCore;
 import config.instructions.callbacks.DoneCallback;
 import config.instructions.callbacks.InstructionCallback;
-import config.pixelMatching.PixelStateCollection;
 import java.awt.Robot;
 
-public class WaitForPixelState implements Instruction {
+public class MouseSnap implements Instruction {
 
-	@JsonProperty("pixelStateCollection")
-	PixelStateCollection pixelStateCollection = null;
+	@JsonProperty("x")
+	private int x;
+
+	@JsonProperty("y")
+	private int y;
 
 	@Override
 	public InstructionCallback run(Robot robot, LoadedConfigCore configCore, DisplayConfig displayConfig) {
-		while(!pixelStateCollection.allPixelsMatching(robot));
+		robot.mouseMove(displayConfig.applyXScale(x), displayConfig.applyYScale(y));
 		return new DoneCallback();
 	}
 }

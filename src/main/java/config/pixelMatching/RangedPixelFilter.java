@@ -1,9 +1,9 @@
 package config.pixelMatching;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import config.DisplayConfig;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import utils.RGBColor;
 
 public class RangedPixelFilter implements ProbingPixel {
 	@JsonProperty("x")
@@ -13,10 +13,10 @@ public class RangedPixelFilter implements ProbingPixel {
 	public int y;
 
 	@JsonProperty("rgbFrom")
-	public RGBColor colorFrom = null;
+	public RGBColor rgbFrom = null;
 
 	@JsonProperty("rgbTo")
-	public RGBColor colorTo = null;
+	public RGBColor rgbTo = null;
 
 	/**
 	 * Is required for instantiation when deserializing from config!
@@ -24,11 +24,11 @@ public class RangedPixelFilter implements ProbingPixel {
 	private RangedPixelFilter() {
 	}
 
-	public RangedPixelFilter(int x, int y, RGBColor colorFrom, RGBColor colorTo) {
+	public RangedPixelFilter(int x, int y, RGBColor rgbFrom, RGBColor rgbTo) {
 		this.x = x;
 		this.y = y;
-		this.colorFrom = colorFrom;
-		this.colorTo = colorTo;
+		this.rgbFrom = rgbFrom;
+		this.rgbTo = rgbTo;
 	}
 
 	@Override
@@ -44,7 +44,23 @@ public class RangedPixelFilter implements ProbingPixel {
 	@Override
 	public boolean correctColor(BufferedImage buffImg, Rectangle screenshotArea) {
 		RGBColor color = new RGBColor(buffImg.getRGB(x - screenshotArea.x, y - screenshotArea.y));
-		return colorFrom.red > color.red || colorFrom.green > color.green || colorFrom.blue > color.blue
-				|| colorTo.red < color.red || colorTo.green < color.green || colorTo.blue < color.blue;
+		return rgbFrom.red > color.red || rgbFrom.green > color.green || rgbFrom.blue > color.blue
+				|| rgbTo.red < color.red || rgbTo.green < color.green || rgbTo.blue < color.blue;
+	}
+
+	@Override
+	public void applyDisplayScale(DisplayConfig displayConfig) {
+		this.x = displayConfig.applyXScale(this.x);
+		this.y = displayConfig.applyYScale(this.y);
+	}
+
+	@Override
+	public String toString() {
+		return "RangedPixelFilter{" +
+				"x=" + x +
+				", y=" + y +
+				", colorFrom=" + rgbFrom +
+				", colorTo=" + rgbTo +
+				'}';
 	}
 }

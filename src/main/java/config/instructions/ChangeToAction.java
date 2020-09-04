@@ -1,8 +1,11 @@
 package config.instructions;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import config.DisplayConfig;
+import config.LoadedConfigCore;
+import config.instructions.callbacks.ChangeToActionCallback;
+import config.instructions.callbacks.InstructionCallback;
 import java.awt.Robot;
-import keybinds.KeyManager;
 
 public class ChangeToAction implements Instruction {
 
@@ -10,7 +13,7 @@ public class ChangeToAction implements Instruction {
 	public String actionName = null;
 
 	@Override
-	public void run(Robot robot, KeyManager keyManager) {
-		// TODO
+	public InstructionCallback run(Robot robot, LoadedConfigCore configCore, DisplayConfig displayConfig) {
+		return new ChangeToActionCallback(actionName);
 	}
 }

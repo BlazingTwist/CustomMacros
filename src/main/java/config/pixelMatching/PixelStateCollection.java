@@ -1,14 +1,11 @@
 package config.pixelMatching;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import config.deserializers.PixelStateCollectionDeserializer;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
-@JsonDeserialize(using = PixelStateCollectionDeserializer.class)
 public class PixelStateCollection {
 	private final ArrayList<ProbingPixel> probingPixels = new ArrayList<>();
 	private Rectangle targetRectangle = null;

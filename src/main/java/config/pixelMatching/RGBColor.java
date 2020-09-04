@@ -1,4 +1,4 @@
-package utils;
+package config.pixelMatching;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -32,6 +32,20 @@ public class RGBColor {
 
 	public int toAwtColor() {
 		return (red << 16) + (green << 8) + blue;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if(obj == this){
+			return true;
+		}
+
+		if(!(obj instanceof RGBColor)){
+			return false;
+		}
+
+		RGBColor other = (RGBColor) obj;
+		return other.red == this.red && other.green == this.green && other.blue == this.blue;
 	}
 
 	@Override

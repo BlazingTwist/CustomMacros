@@ -1,8 +1,7 @@
 package config.pixelMatching;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import config.deserializers.ColorDeserializer;
+import config.DisplayConfig;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
@@ -15,8 +14,7 @@ public class ExactPixelFilter implements ProbingPixel {
 	public int y;
 
 	@JsonProperty("rgb")
-	@JsonDeserialize(using = ColorDeserializer.class)
-	public int rgb;
+	public RGBColor rgb;
 
 	/**
 	 * Is required for instantiation when deserializing from config!
@@ -24,7 +22,7 @@ public class ExactPixelFilter implements ProbingPixel {
 	private ExactPixelFilter() {
 	}
 
-	public ExactPixelFilter(int x, int y, int rgb) {
+	public ExactPixelFilter(int x, int y, RGBColor rgb) {
 		this.x = x;
 		this.y = y;
 		this.rgb = rgb;
@@ -42,6 +40,22 @@ public class ExactPixelFilter implements ProbingPixel {
 
 	@Override
 	public boolean correctColor(BufferedImage buffImg, Rectangle screenshotArea) {
-		return buffImg.getRGB(x - screenshotArea.x, y - screenshotArea.y) != rgb;
+		int colorValue = buffImg.getRGB(x - screenshotArea.x, y - screenshotArea.y);
+		return !rgb.equals(new RGBColor(colorValue));
+	}
+
+	@Override
+	public void applyDisplayScale(DisplayConfig displayConfig) {
+		this.x = displayConfig.applyXScale(this.x);
+		this.y = displayConfig.applyYScale(this.y);
+	}
+
+	@Override
+	public String toString() {
+		return "ExactPixelFilter{" +
+				"x=" + x +
+				", y=" + y +
+				", rgb=" + rgb +
+				'}';
 	}
 }
