@@ -19,7 +19,7 @@ public class LoadedConfigCore {
 	private KeyManager keyManager;
 
 	@JsonProperty("hotkeys")
-	private ArrayList<Hotkey> hotkeys;
+	private HashMap<String, Hotkey> hotkeys;
 
 	@JsonProperty("flowControl")
 	private FlowControlConfig flowControl;
@@ -40,7 +40,7 @@ public class LoadedConfigCore {
 		return keyManager;
 	}
 
-	public ArrayList<Hotkey> getHotkeys() {
+	public HashMap<String, Hotkey> getHotkeys() {
 		return hotkeys;
 	}
 

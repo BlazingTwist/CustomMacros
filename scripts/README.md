@@ -1,3 +1,14 @@
+# Running scripts
+
+Running scripts with CustomMacros is fortunately simple:  
+You'll need the `custom-macros.jar` executable jar and your `.conf` scripts.  
+You can run scripts using this command pattern: `java -jar {path-to-custom-macros.jar} {path-to-script-1} ... {path-to-script-n}`  
+As your `path-to-script` you can specify a relative or absolute path a file or folder.  
+If you supply a folder as your `path-to-script` CustomMacros will load *every* `.conf` file at any depth within that folder.  
+You can also take a look at the `example` folder for a general reference.
+
+<br/>
+
 # Using the .conf Files for writing custom scripts
 
 The .conf Files are HOCON files.  
@@ -7,7 +18,7 @@ You can find an exhaustive documentation on HOCON [here](https://github.com/ligh
 ## General Structure
 
 You can place any kind of HOCON valid text in the root of your .conf Files.  
-There are however a few reserved object keys that required a strictly defined structure:
+There are however a few reserved object keys that require a strictly defined structure:
 
 * actions
 * displayConfig
@@ -67,28 +78,27 @@ flowControl {
 
 #### ***hotkeys***
 
-Here you can specify all entry-points for your actions, every hotkey object has 4 fields:  
-`keybind` the name of the keybind the hotkey is activated with.  
+Here you can specify all the keybinds to entry-points for your actions.  
+The keybind is specified as the object key and must correspond to the registered keybindNames  
+Every hotkey object has 3 fields:    
 `global` boolean value, global hotkeys can trigger during execution of another action and will act like the "ChangeToAction" Instruction.  
 `module` the name of the module that this hotkey executes.  
 `action` the name of the action (within the executed module) that this hotkey executes.
 
 ```hocon
-hotkeys = [
-  {
-    keybind = keybindName1
+hotkeys = {
+  keybindName1 {
     global = false
     module = moduleName
     action = actionName1
   }
   //...
-  {
-    keybind = keybindNameN
+  keybindNameN {
     global = true
     module = moduleName
     action = actionNameN
   }
-]
+}
 ```
 
 <br/>

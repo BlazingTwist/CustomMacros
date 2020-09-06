@@ -32,4 +32,11 @@ public class OnKeyDownModule implements KeyModule {
 	public boolean isPressed() {
 		return pressed && !wasPressed;
 	}
+
+	@Override
+	public String toString() {
+		return "OnKeyDownModule{" +
+				"keyEvent=" + keyEvent +
+				'}';
+	}
 }

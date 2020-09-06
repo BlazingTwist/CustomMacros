@@ -32,4 +32,11 @@ public class OnKeyUpModule implements KeyModule {
 	public boolean isPressed() {
 		return !pressed && wasPressed;
 	}
+
+	@Override
+	public String toString() {
+		return "OnKeyUpModule{" +
+				"keyEvent=" + keyEvent +
+				'}';
+	}
 }

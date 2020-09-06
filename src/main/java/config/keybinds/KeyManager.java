@@ -2,8 +2,10 @@ package config.keybinds;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import lc.kra.system.keyboard.GlobalKeyboardHook;
 import lc.kra.system.keyboard.event.GlobalKeyAdapter;
 import lc.kra.system.keyboard.event.GlobalKeyEvent;
@@ -15,6 +17,10 @@ public class KeyManager {
 
 	public KeyManager(HashMap<String, ArrayList<KeyModule>> keybinds) {
 		this.keybinds = keybinds;
+
+		for(Map.Entry<String, ArrayList<KeyModule>> entry : keybinds.entrySet()){
+			System.out.println("got keybind: " + entry.getKey() + " | keybinds: " + entry.getValue().stream().map(Object::toString).collect(Collectors.joining(", ")));
+		}
 
 		keyboardHook = new GlobalKeyboardHook(true);
 

@@ -14,19 +14,65 @@ import config.instructions.callbacks.ChangeToActionCallback;
 import config.instructions.callbacks.EncounteredExceptionCallback;
 import config.instructions.callbacks.InsertActionCallback;
 import config.instructions.callbacks.InstructionCallback;
+import config.keybinds.Hotkey;
 import config.pixelMatching.PixelStateCollection;
 import java.awt.AWTException;
 import java.awt.Robot;
+import java.io.File;
+import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import config.keybinds.Hotkey;
 
 public class Main {
+	private static final FilenameFilter configFileNameFilter = new FilenameFilter(){
+		@Override
+		public boolean accept(File dir, String name) {
+			return name.toLowerCase().endsWith(".conf");
+		}
+	};
+
+	private static void addAllFiles(File[] files, ArrayList<File> targetList){
+		if(files == null){
+			return;
+		}
+
+		for(File file : files){
+			if(!file.exists()){
+				continue;
+			}
+			if(file.isDirectory()){
+				addAllFiles(file.listFiles(configFileNameFilter), targetList);
+			}else if(file.isFile()){
+				targetList.add(file);
+			}else{
+				System.out.println("file: " + file.getAbsolutePath() + " is neither file nor directory! What is it then?");
+			}
+		}
+	}
+
 	public static void main(String[] args) {
+		ArrayList<File> configFilesToLoad = new ArrayList<>();
+
+		for(String argument : args){
+			File file = new File(argument);
+			if(!file.exists()){
+				System.out.println("file: " + argument + " doesn't exist!");
+				continue;
+			}
+			if(file.isDirectory()){
+				addAllFiles(file.listFiles(configFileNameFilter), configFilesToLoad);
+			}else if(file.isFile()){
+				configFilesToLoad.add(file);
+			}else{
+				System.out.println("file: " + argument + " is neither file nor directory! What is it then?");
+			}
+		}
+
 		Main main = new Main();
-		main.prepare();
+		main.prepare(configFilesToLoad);
 	}
 
 	Main() {
@@ -41,7 +87,12 @@ public class Main {
 	private final ArrayList<Instruction> activeInstructions = new ArrayList<>();
 	private Timer inactiveShutdownTimer = null;
 
-	private void prepare() {
+	private void prepare(ArrayList<File> configFilesToLoad) {
+		if(configFilesToLoad.size() == 0){
+			System.err.println("didn't receive any config files to load, make sure you passed them as parameters without typos!");
+			return;
+		}
+
 		Robot robot;
 		try {
 			robot = new Robot();
@@ -53,14 +104,15 @@ public class Main {
 
 		LoadedConfigCore core;
 		try {
-			Config scriptConfig = ConfigFactory.parseResources("testConfig2.conf");
-			Config coreConfig = ConfigFactory.parseResources("testCoreConfig.conf")
-					.withFallback(scriptConfig);
-			Config resolvedConfig = coreConfig.resolve();
+			Config config = ConfigFactory.parseFile(configFilesToLoad.get(0));
+			for(int i = 1; i < configFilesToLoad.size(); i++){
+				config = config.withFallback(ConfigFactory.parseFile(configFilesToLoad.get(i)));
+			}
+			Config resolvedConfig = config.resolve();
 			String displayConfigJson = resolvedConfig.getConfig("displayConfig").root().render(ConfigRenderOptions.concise());
 			String coreConfigJson = resolvedConfig.root().render(ConfigRenderOptions.concise());
-			System.out.println("displayConfig: " + displayConfigJson);
-			System.out.println("coreConfig: " + coreConfigJson);
+			System.out.println("displayConfig: " + displayConfigJson + "\n");
+			System.out.println("coreConfig: " + coreConfigJson + "\n");
 
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_VALUES);
@@ -163,10 +215,11 @@ public class Main {
 			System.exit(-1);
 		}
 
-		for (Hotkey hotkey : configCore.getHotkeys()) {
-			if (!keybind.equalsIgnoreCase(hotkey.getKeybind())) {
+		for (Map.Entry<String, Hotkey> entry : configCore.getHotkeys().entrySet()) {
+			if (!keybind.equalsIgnoreCase(entry.getKey())) {
 				continue;
 			}
+			Hotkey hotkey = entry.getValue();
 			if (!activeInstructions.isEmpty() && !hotkey.isGlobal()) {
 				// currently executing instructions, keybind would have to be global to trigger
 				continue;
@@ -190,19 +243,17 @@ public class Main {
 			}
 			if (!activeInstructions.isEmpty()) {
 				runInstructions(robot);
-			} else {
-				System.out.println("got notified but still no instructions, what the heck?");
 			}
 		}
 	}
 
 	private void printHotkeys() {
-		for (Hotkey hotkey : configCore.getHotkeys()) {
+		for (Map.Entry<String, Hotkey> entry : configCore.getHotkeys().entrySet()) {
 			System.out.println("\tkeybind: "
-					+ hotkey.getKeybind()
+					+ entry.getKey()
 					+ " | triggers: "
-					+ hotkey.getModule()
-					+ "/" + hotkey.getAction());
+					+ entry.getValue().getModule()
+					+ "/" + entry.getValue().getAction());
 		}
 	}
 
@@ -235,16 +286,9 @@ public class Main {
 	}
 
 	private void runInstructions(Robot robot) {
-		/*XStream xStream = new XStream(new Sun14ReflectionProvider(
-				new FieldDictionary(new ImmutableFieldKeySorter())),
-				new DomDriver("utf-8"));
-		System.out.println(xStream.toXML(core));*/
+		// TODO consider creating scripts for my other QOL bots
 
-		// TODO figure out how to make executable
-		// TODO drag and drop script(s) to executable to run them
-		// TODO drag and drop folder(s) to executable to run all scripts within them
-		// TODO update documentation to inform on how to run scripts
-		// TODO update scripts
+		// TODO unitTests ? sounds reasonable, but might just be busy-work
 
 		while (!activeInstructions.isEmpty()) {
 			if (paused) {

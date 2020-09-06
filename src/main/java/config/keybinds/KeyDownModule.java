@@ -28,4 +28,11 @@ public class KeyDownModule implements KeyModule {
 	public boolean isPressed() {
 		return pressed;
 	}
+
+	@Override
+	public String toString() {
+		return "KeyDownModule{" +
+				"keyEvent=" + keyEvent +
+				'}';
+	}
 }
