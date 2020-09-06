@@ -168,6 +168,26 @@ It is recommended to use the short-form for Instructions to improve readability 
 {type = InstructionType, param1 = value1, ..., paramN = valueN}
 ```
 
+These Instructions are currently supported:
+* [ChangeToAction](#changetoaction)
+* [ExecCommand](#execcommand)
+* [LogMessage](#logmessage)
+* [MouseClick](#mouseclick)
+* [MouseMove](#mousemove)
+* [MousePress](#mousePress)
+* [MouseRelease](#mouserelease)
+* [MouseSnap](#mousesnap)
+* [PressKey](#presskey)
+* [ProbeScreen](#probescreen)
+* [ReleaseKey](#releasekey)
+* [Repeat](#repeat)
+* [RunAction](#runaction)
+* [TapKey](#tapkey)
+* [TestKeybind](#testkeybind)
+* [Wait](#wait)
+* [WaitForKeybind](#waitforkeybind)
+* [WaitForPixelState](#waitforpixelstate)
+
 <br/>
 
 #### ***ChangeToAction***
