@@ -31,7 +31,7 @@ There are however a few reserved object keys that require a strictly defined str
 
 #### ***actions***
 
-In code, the actions object is stored as a Map<ModuleName, Map<ActionName, List<Instruction>>>  
+In code, the actions object is stored as a Map\<ModuleName, Map\<ActionName, List\<Instruction\>\>\>  
 As such, it represents a hierarchy of ModuleName -> ActionName -> Instructions.
 
 ModuleName and ActionName are up to you to decide (no duplicates), however Instructions are rigidly defined.  
@@ -106,7 +106,7 @@ hotkeys = {
 #### ***keybinds***
 
 In this object all available keybinds and their assigned keys are specified.  
-The structure is a Map<String, List<KeyModule>>, as such, every key in the keybinds object is used as the name for the keybind.  
+The structure is a Map\<String, List\<KeyModule\>\>, as such, every key in the keybinds object is used as the name for the keybind.  
 There are currently four types of KeyModules:  
 `KeyDown` Is satisfied if the assigned key is pressed.  
 `KeyUp` Is satisfied if the assigned key is released.  
