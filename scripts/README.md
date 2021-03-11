@@ -3,7 +3,7 @@
 Running scripts with CustomMacros is fortunately simple:  
 You'll need the `custom-macros.jar` executable jar and your `.conf` scripts.  
 You can run scripts using this command pattern: `java -jar {path-to-custom-macros.jar} {path-to-script-1} ... {path-to-script-n}`  
-As your `path-to-script` you can specify a relative or absolute path a file or folder.  
+As your `path-to-script` you can specify a relative or absolute path to a file or folder.  
 If you supply a folder as your `path-to-script` CustomMacros will load *every* `.conf` file at any depth within that folder.  
 You can also take a look at the `example` folder for a general reference.
 
